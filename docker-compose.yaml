@@ -1,27 +1,5 @@
 version: '3'
 services:
-  node:
-    build:
-      context: node
-    networks:
-      - ng-node
-    #volumes:
-    #  - ./node:/usr/src/app
-    ports:
-      - "3000:3000"
-    depends_on:
-      database:
-        condition: service_healthy
-
-  nginx:
-    build:
-      context: nginx
-    networks:
-      - ng-node
-    ports:
-      - "8080:8080"
-    restart: always
-
   database:
     image: mysql:5.7
     command: --innodb-use-native-aio=0
@@ -40,6 +18,29 @@ services:
       interval: 5s
       timeout: 10s
       retries: 3
+
+  node:
+    build:
+      context: node
+    networks:
+      - ng-node
+    volumes:
+      - ./node:/usr/src/app
+      -  /usr/src/app/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      database:
+        condition: service_healthy
+
+  nginx:
+    build:
+      context: nginx
+    networks:
+      - ng-node
+    ports:
+      - "8080:8080"
+    restart: always
 
 networks:
   ng-node:
